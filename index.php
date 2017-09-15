@@ -14,6 +14,7 @@ $database = new \Medoo\Medoo(
     )
 );
 
-$data = $database->select("fbData", "*");
+$data = $database->select("posts", "*");
 
 print_r($data);
+///"https://www.facebook.com/permalink.php?id=".$id[0]."&v=wall&story_fbid=".$id[1],

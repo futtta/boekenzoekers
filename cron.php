@@ -31,22 +31,28 @@ $request = $fb->get("/".BOEKENJAGERS_GROUPID."/feed");
 $graphEdge = $request->getGraphEdge();
 
 //Load data from gemeentes
-$dbData = $database->select("gemeentes", array("postcode", "naam"));
+$dbData = $database->select("gemeentes", array("zipcode", "name"));
 
 //Loop through the posts
 foreach($graphEdge->all() as $graphNode) {
     $postData = $graphNode->all();
-    //Loop throught gemeentes
+
+    //Loop through gemeentes
     foreach($dbData as $row){
-        if( preg_match("~\b".strtolower($row["naam"])."\b~", strtolower($postData["message"])) > 0) {
+        if( preg_match("~\b".strtolower($row["name"])."\b~", strtolower($postData["message"])) > 0) {
             $id = explode("_", $postData["id"]);
 
-            $database->insert("fbData", array(
-                "locatie" => $row["postcode"],
-                "fbURL" => "https://www.facebook.com/permalink.php?id=".$id[0]."&v=wall&story_fbid=".$id[1],
-                "fbTime" => date("Y-m-d H:i:s",$postData["updated_time"]->getTimestamp()),
-                "fbTekst" => $postData["message"]
-            ));
+            $count = $database->count("posts", array("postID" => $id[1]));
+
+            if ($count == 0) {
+                $database->insert("posts", array(
+                    "zipcode" => $row["zipcode"],
+                    "postID" => $id[1],
+                    "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp()),
+                    "text" => $postData["message"]
+                ));
+            }
+
             break;
         }
     }

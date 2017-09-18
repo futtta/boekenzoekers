@@ -23,20 +23,25 @@ $database = new \Medoo\Medoo(
 <html>
 <head>
     <title>Boekenzoekers</title>
+    <link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
 
 <form action="" method="get">
-    Gemeente/Postcode:&nbsp;<input type="text" name="gemeente" size="100"><input type="submit" value="Zoek"><br/><br/>
+    <p>
+        <label for="gemeente">Gemeente/Postcode:</label>&nbsp;
+        <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam">&nbsp;
+        <input type="submit" value="Zoek">
+    </p>
 </form>
 
-<table border="1">
+<table>
     <tr>
-        <td>Postcode</td>
-        <td>Gemeente</td>
-        <td>Tekst</td>
-        <td>Post Datum</td>
-        <td>Facebook Link</td>
+        <th>Postcode</th>
+        <th>Gemeente</th>
+        <th>Tekst</th>
+        <th>Post Datum</th>
+        <th>Post Link</th>
     </tr>
     <?php drawPosts(); ?>
 </table>
@@ -81,12 +86,13 @@ function getSearch()
 
 /**
  * Get Limit parameters in case search is not empty
- * @param $search
+ * @param &$search
  * @return array
  */
-function getLimit($search = array())
+function getLimit(&$search = array())
 {
-    $limit = array("time" => "DESC");
+    $search["ORDER"] = array("time" => "DESC");
+    $limit = array();
 
     if (empty($search)) {
         $limit["LIMIT"] = 100;
@@ -104,7 +110,6 @@ function drawPosts()
 
     $search = getSearch();
     $limit = getLimit($search);
-
     $data = $database->select("posts", "*", $search, $limit);
 
     foreach ($data as $row) {
@@ -113,7 +118,7 @@ function drawPosts()
         print("<td>" . $row["gemeente"] . "</td>");
         print("<td>" . shortenText($row["text"]) . "</td>");
         print("<td>" . $row["time"] . "</td>");
-        print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">fb icon?</a></td>");
+        print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\"><img src=\"img/fb-icon.png\"></a></td>");
         print("</tr>");
     }
 }

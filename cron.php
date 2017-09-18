@@ -26,8 +26,15 @@ $database = new \Medoo\Medoo(
     )
 );
 
+//Get the last checked date
+$lastDate = $database->get("gemeentes", array("zipcode", "name"), array("zipcode" => 1));
+$currentDate = time();
+
+//Save the last checked date in the database
+$database->update("gemeentes", array("name" => $currentDate), array("zipcode" => 1));
+
 //Request feed from facebook
-$request = $fb->get("/" . BOEKENJAGERS_GROUPID . "/feed?limit=100");
+$request = $fb->get("/" . BOEKENJAGERS_GROUPID . "/feed?limit=100&since=".$lastDate["name"]);
 $graphEdge = $request->getGraphEdge();
 
 //Load data from gemeentes

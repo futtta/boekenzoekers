@@ -110,15 +110,23 @@ function drawPosts()
 
     $search = getSearch();
     $limit = getLimit($search);
-    $data = $database->select("posts", "*", $search, $limit);
+    $count = $database->count("posts", "*", $search, $limit);
 
-    foreach ($data as $row) {
+    if($count == 0) {
         print("<tr>");
-        print("<td>" . $row["zipcode"] . "</td>");
-        print("<td>" . $row["gemeente"] . "</td>");
-        print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
-        print("<td>" . drawTime($row["time"]) . "</td>");
+        print("<td colspan=\"4\">Geen resultaten gevonden: <b>Keep calm and hide a book!</b></td>");
         print("</tr>");
+    } else {
+        $data = $database->select("posts", "*", $search, $limit);
+
+        foreach ($data as $row) {
+            print("<tr>");
+            print("<td>" . $row["zipcode"] . "</td>");
+            print("<td>" . $row["gemeente"] . "</td>");
+            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
+            print("<td>" . drawTime($row["time"]) . "</td>");
+            print("</tr>");
+        }
     }
 }
 

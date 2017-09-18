@@ -64,6 +64,11 @@ foreach ($graphEdge->all() as $graphNode) {
                     "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp()),
                     "text" => $postData["message"]
                 ));
+            } else {
+                $database->update("posts",
+                    array( "text" => $postData["message"]),
+                    array("postID" => $id[1], "gemeente" => $row["name"], "zipcode" => $row["zipcode"])
+                );
             }
         }
     }

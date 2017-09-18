@@ -42,7 +42,6 @@ $database = new \Medoo\Medoo(
         <th>Gemeente</th>
         <th>Tekst</th>
         <th>Post Datum</th>
-        <th>Post Link</th>
     </tr>
     <?php drawPosts(); ?>
 </table>
@@ -117,9 +116,8 @@ function drawPosts()
         print("<tr>");
         print("<td>" . $row["zipcode"] . "</td>");
         print("<td>" . $row["gemeente"] . "</td>");
-        print("<td>" . shortenText($row["text"]) . "</td>");
+        print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
         print("<td>" . drawTime($row["time"]) . "</td>");
-        print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\"><img src=\"img/fb-icon.png\"></a></td>");
         print("</tr>");
     }
 }

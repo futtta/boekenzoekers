@@ -48,3 +48,19 @@ input[type=submit] {
     border-radius: 4px;
     cursor: pointer;
 }
+
+a:link {
+    color: #4e4e4e;
+}
+
+a:visited {
+    color: #808080;
+}
+
+a:hover {
+    color: #1e1e1e;
+}
+
+a:active {
+    color: #747474;
+}

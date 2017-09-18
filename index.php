@@ -118,10 +118,23 @@ function drawPosts()
         print("<td>" . $row["zipcode"] . "</td>");
         print("<td>" . $row["gemeente"] . "</td>");
         print("<td>" . shortenText($row["text"]) . "</td>");
-        print("<td>" . $row["time"] . "</td>");
+        print("<td>" . drawTime($row["time"]) . "</td>");
         print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\"><img src=\"img/fb-icon.png\"></a></td>");
         print("</tr>");
     }
 }
 
+/**
+ * Nice output for timestamp from mysql
+ * @param $time String mysql timestamp
+ * @return string Nicer output
+ */
+function drawTime($time)
+{
+    if(date("Ymd") == date("Ymd", strtotime($time))) {
+        return strftime("Vandaag om %H:%M", strtotime($time));
+    } else {
+        return strftime("%d/%m/%Y om %H:%M", strtotime($time));
+    }
+}
 ?>

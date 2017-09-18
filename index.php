@@ -28,10 +28,10 @@ $database = new \Medoo\Medoo(
 </head>
 <body>
 
-<form action="" method="get">
+<form action="">
     <p>
         <label for="gemeente">Gemeente/Postcode:</label>&nbsp;
-        <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam">&nbsp;
+        <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam" value="<?php getGemeente(); ?>">&nbsp;
         <input type="submit" value="Zoek">
     </p>
 </form>
@@ -135,6 +135,16 @@ function drawTime($time)
         return strftime("Gisteren om %H:%M", strtotime($time));
     } else {
         return strftime("%d/%m/%Y om %H:%M", strtotime($time));
+    }
+}
+
+/**
+ * Show the gemeente in a value
+ */
+function getGemeente()
+{
+    if(isset($_GET["gemeente"])) {
+        print(htmlspecialchars($_GET["gemeente"]));
     }
 }
 ?>

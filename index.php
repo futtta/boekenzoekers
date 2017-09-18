@@ -131,6 +131,8 @@ function drawTime($time)
 {
     if(date("Ymd") == date("Ymd", strtotime($time))) {
         return strftime("Vandaag om %H:%M", strtotime($time));
+    } else if (date("Ymd", strtotime("-1 days")) == date("Ymd", strtotime($time))) {
+        return strftime("Gisteren om %H:%M", strtotime($time));
     } else {
         return strftime("%d/%m/%Y om %H:%M", strtotime($time));
     }

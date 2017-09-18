@@ -43,10 +43,11 @@ foreach ($graphEdge->all() as $graphNode) {
             break;
         }
 
+        //If theres a match insert into db, and keep on searching for others
         if (preg_match("~\b" . strtolower($row["name"]) . "\b~", strtolower($postData["message"])) > 0) {
             $id = explode("_", $postData["id"]);
 
-            $count = $database->count("posts", array("postID" => $id[1]));
+            $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $row["name"], "zipcode" => $row["zipcode"]));
 
             if ($count == 0) {
                 $database->insert("posts", array(
@@ -57,8 +58,6 @@ foreach ($graphEdge->all() as $graphNode) {
                     "text" => $postData["message"]
                 ));
             }
-
-            break;
         }
     }
 }

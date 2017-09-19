@@ -56,7 +56,7 @@ foreach ($graphEdge->all() as $graphNode) {
 
         if(strpos($row["name"], "-") !== false) {
             $tRow = $row;
-            $tRow["name"] = str_replace("-", "", $tRow["name"]);
+            $tRow["name"] = str_replace("-", " ", $tRow["name"]);
 
             checkNameinText($tRow, $postData);
         }
@@ -68,7 +68,7 @@ foreach ($graphEdge->all() as $graphNode) {
             checkNameinText($tRow, $postData);
 
             if(strpos($row["name"], "-") !== false) {
-                $tRow["name"] = str_replace("-", "", $tRow["name"]);
+                $tRow["name"] = str_replace("-", " ", $tRow["name"]);
                 checkNameinText($tRow, $postData);
             }
         }

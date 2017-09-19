@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set("Europe/Brussels");
+
 //Boekenjagers FB GROUP ID
 define("BOEKENJAGERS_GROUPID", 173371763090905);
 

@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set("Europe/Brussels");
+
 //Boekenjagers FB GROUP ID
 define("BOEKENJAGERS_GROUPID", 173371763090905);
 
@@ -66,7 +68,7 @@ foreach ($graphEdge->all() as $graphNode) {
                 ));
             } else {
                 $database->update("posts",
-                    array( "text" => $postData["message"]),
+                    array( "text" => $postData["message"], "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp())),
                     array("postID" => $id[1], "gemeente" => $row["name"], "zipcode" => $row["zipcode"])
                 );
             }

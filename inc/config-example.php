@@ -20,3 +20,6 @@ $appSecret = "";
 
 //How many days before posts may be deleted from the database
 $daysBeforeDelete = 90;
+
+//Boekenjagers GroupID
+$fbGroupID = 0;

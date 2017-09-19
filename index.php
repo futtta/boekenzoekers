@@ -1,10 +1,6 @@
 <?php
 date_default_timezone_set("Europe/Brussels");
 
-//Boekenjagers FB GROUP ID
-define("BOEKENJAGERS_GROUPID", 173371763090905);
-
-
 //Includes
 require_once("inc/config.php");
 require_once("vendor/autoload.php");
@@ -113,7 +109,7 @@ function getLimit(&$search = array())
  */
 function drawPosts()
 {
-    global $database;
+    global $database,$fbGroupID;
 
     $search = getSearch();
     $limit = getLimit($search);
@@ -130,7 +126,7 @@ function drawPosts()
             print("<tr>");
             print("<td>" . $row["zipcode"] . "</td>");
             print("<td>" . $row["gemeente"] . "</td>");
-            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . BOEKENJAGERS_GROUPID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
+            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
             print("<td>" . drawTime($row["time"]) . "</td>");
             print("</tr>");
         }

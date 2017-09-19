@@ -1,9 +1,6 @@
 <?php
 date_default_timezone_set("Europe/Brussels");
 
-//Boekenjagers FB GROUP ID
-define("BOEKENJAGERS_GROUPID", 173371763090905);
-
 //Includes
 require_once("inc/config.php");
 require_once("vendor/autoload.php");
@@ -36,7 +33,7 @@ $currentDate = time();
 $database->update("gemeentes", array("name" => $currentDate), array("zipcode" => 1));
 
 //Request feed from facebook
-$request = $fb->get("/" . BOEKENJAGERS_GROUPID . "/feed?limit=100&since=".$lastDate["name"]);
+$request = $fb->get("/" . $fbGroupID . "/feed?limit=100&since=".$lastDate["name"]);
 $graphEdge = $request->getGraphEdge();
 
 //Load data from gemeentes

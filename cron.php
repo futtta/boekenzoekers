@@ -52,29 +52,67 @@ foreach ($graphEdge->all() as $graphNode) {
             break;
         }
 
-        //If theres a match insert into db, and keep on searching for others
-        if (preg_match("~\b" . strtolower($row["name"]) . "\b~", strtolower($postData["message"])) > 0) {
-            $id = explode("_", $postData["id"]);
+        checkNameinText($row, $postData);
 
-            $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $row["name"], "zipcode" => $row["zipcode"]));
+        if(strpos($row["name"], "-") !== false) {
+            $tRow = $row;
+            $tRow["name"] = str_replace("-", "", $tRow["name"]);
 
-            if ($count == 0) {
-                $database->insert("posts", array(
-                    "zipcode" => $row["zipcode"],
-                    "gemeente" => $row["name"],
-                    "postID" => $id[1],
-                    "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp()),
-                    "text" => $postData["message"]
-                ));
-            } else {
-                $database->update("posts",
-                    array( "text" => $postData["message"], "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp())),
-                    array("postID" => $id[1], "gemeente" => $row["name"], "zipcode" => $row["zipcode"])
-                );
+            checkNameinText($tRow, $postData);
+        }
+
+        if(strpos(strtolower($row["name"]), "sint") !== false) {
+            $tRow = $row;
+            $tRow["name"] = str_replace("sint", "st", $tRow["name"]);
+
+            checkNameinText($tRow, $postData);
+
+            if(strpos($row["name"], "-") !== false) {
+                $tRow["name"] = str_replace("-", "", $tRow["name"]);
+                checkNameinText($tRow, $postData);
             }
         }
     }
 }
 
-//delete all old posts
-$database->delete("posts", array("[<]time" => date("Y-m-d H:i:s", strtotime("-90 days"))));
+deleteOldPosts();
+/**
+ * Delete old posts from the database
+ */
+function deleteOldPosts()
+{
+    global $daysBeforeDelete,$database;
+
+    $database->delete("posts", array("[<]time" => date("Y-m-d H:i:s", strtotime("-".$daysBeforeDelete." days"))));
+}
+
+/**
+ * Check if the city name is in the text and insert or update the database
+ * @param $cityData array CityData from database
+ * @param $postData array PostData from facebook
+ */
+function checkNameinText($cityData, $postData)
+{
+    global $database;
+
+    if (preg_match("~\b" . strtolower($cityData["name"]) . "\b~", strtolower($postData["message"])) > 0) {
+        $id = explode("_", $postData["id"]);
+
+        $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));
+
+        if ($count == 0) {
+            $database->insert("posts", array(
+                "zipcode" => $cityData["zipcode"],
+                "gemeente" => $cityData["name"],
+                "postID" => $id[1],
+                "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp()),
+                "text" => $postData["message"]
+            ));
+        } else {
+            $database->update("posts",
+                array( "text" => $postData["message"], "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp())),
+                array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
+            );
+        }
+    }
+}

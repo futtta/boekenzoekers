@@ -17,3 +17,6 @@ $dbPassword = "databasepassword";
 $appID = "";
 //App Secret
 $appSecret = "";
+
+//How many days before posts may be deleted from the database
+$daysBeforeDelete = 90;

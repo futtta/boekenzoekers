@@ -52,26 +52,15 @@ foreach ($graphEdge->all() as $graphNode) {
             break;
         }
 
-        checkNameinText($row, $postData);
-
         if(strpos($row["name"], "-") !== false) {
-            $tRow = $row;
-            $tRow["name"] = str_replace("-", " ", $tRow["name"]);
-
-            checkNameinText($tRow, $postData);
+           $row["name"] = str_replace("-", "[-|\s]", $row["name"]);
         }
 
         if(strpos(strtolower($row["name"]), "sint") !== false) {
-            $tRow = $row;
-            $tRow["name"] = str_replace("sint", "st", $tRow["name"]);
-
-            checkNameinText($tRow, $postData);
-
-            if(strpos($row["name"], "-") !== false) {
-                $tRow["name"] = str_replace("-", " ", $tRow["name"]);
-                checkNameinText($tRow, $postData);
-            }
+            $row["name"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
         }
+
+        checkNameinText($row, $postData);
     }
 }
 

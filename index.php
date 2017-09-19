@@ -76,6 +76,11 @@ function getSearch()
 
     if (isset($_GET["gemeente"])) {
         $zipcode = $_GET["gemeente"];
+
+        if (preg_match("/(st\.?|sint)[-|\s]([A-z]*)/i", $zipcode, $matches)) {
+            $zipcode = "sint-".$matches[2];
+        }
+
         if (is_numeric($zipcode)) {
             $search["zipcode"] = $zipcode;
         } else {

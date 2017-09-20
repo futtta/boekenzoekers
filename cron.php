@@ -5,15 +5,6 @@ date_default_timezone_set("Europe/Brussels");
 require_once("inc/config.php");
 require_once("vendor/autoload.php");
 
-//Init Facebook API
-$fb = new Facebook\Facebook([
-    "app_id" => $appID,
-    "app_secret" => $appSecret,
-    "default_graph_version" => "v2.10",
-]);
-
-$fb->setDefaultAccessToken($fb->getApp()->getAccessToken());
-
 //Init Database
 $database = new \Medoo\Medoo(
     array(
@@ -33,15 +24,14 @@ $currentDate = time();
 $database->update("gemeentes", array("name" => $currentDate), array("zipcode" => 1));
 
 //Request feed from facebook
-$request = $fb->get("/" . $fbGroupID . "/feed?limit=100&since=".$lastDate["name"]);
-$graphEdge = $request->getGraphEdge();
+$data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&since=" . $lastDate["name"] . "&access_token=" . $appID . "|" . $appSecret);
+$data = json_decode($data, true)["data"];
 
 //Load data from gemeentes
 $dbData = $database->select("gemeentes", array("zipcode", "name"));
 
 //Loop through the posts
-foreach ($graphEdge->all() as $graphNode) {
-    $postData = $graphNode->all();
+foreach ($data as $postData) {
     //Loop through gemeentes
     foreach ($dbData as $row) {
         //No Post message = no text = break;
@@ -49,15 +39,15 @@ foreach ($graphEdge->all() as $graphNode) {
             break;
         }
 
-        if(strpos($row["name"], "-") !== false) {
-           $row["regex"] = str_replace("-", "[-|\s]", $row["name"]);
+        if (strpos($row["name"], "-") !== false) {
+            $row["regex"] = str_replace("-", "[-|\s]", $row["name"]);
         }
 
-        if(strpos(strtolower($row["name"]), "sint") !== false) {
+        if (strpos(strtolower($row["name"]), "sint") !== false) {
             $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
         }
 
-        if(!isset($row["regex"])) {
+        if (!isset($row["regex"])) {
             $row["regex"] = $row["name"];
         }
 
@@ -71,9 +61,9 @@ deleteOldPosts();
  */
 function deleteOldPosts()
 {
-    global $daysBeforeDelete,$database;
+    global $daysBeforeDelete, $database;
 
-    $database->delete("posts", array("[<]time" => date("Y-m-d H:i:s", strtotime("-".$daysBeforeDelete." days"))));
+    $database->delete("posts", array("[<]time" => date("Y-m-d H:i:s", strtotime("-" . $daysBeforeDelete . " days"))));
 }
 
 /**
@@ -95,14 +85,36 @@ function checkNameinText($cityData, $postData)
                 "zipcode" => $cityData["zipcode"],
                 "gemeente" => $cityData["name"],
                 "postID" => $id[1],
-                "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp()),
+                "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
                 "text" => $postData["message"]
             ));
         } else {
             $database->update("posts",
-                array( "text" => $postData["message"], "time" => date("Y-m-d H:i:s", $postData["updated_time"]->getTimestamp())),
+                array("text" => $postData["message"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
                 array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
             );
         }
     }
+}
+
+/**
+ * Get the data from the URL using CURL
+ * @param $url String url
+ * @return mixed Data
+ */
+function fetchUrl($url)
+{
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 40);
+
+    $data = curl_exec($ch);
+
+    curl_close($ch);
+
+    return $data;
 }

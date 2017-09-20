@@ -50,11 +50,15 @@ foreach ($graphEdge->all() as $graphNode) {
         }
 
         if(strpos($row["name"], "-") !== false) {
-           $row["name"] = str_replace("-", "[-|\s]", $row["name"]);
+           $row["regex"] = str_replace("-", "[-|\s]", $row["name"]);
         }
 
         if(strpos(strtolower($row["name"]), "sint") !== false) {
-            $row["name"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
+            $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
+        }
+
+        if(!isset($row["regex"])) {
+            $row["regex"] = $row["name"];
         }
 
         checkNameinText($row, $postData);
@@ -81,7 +85,7 @@ function checkNameinText($cityData, $postData)
 {
     global $database;
 
-    if (preg_match("~\b" . strtolower($cityData["name"]) . "\b~", strtolower($postData["message"])) > 0) {
+    if (preg_match("~\b" . strtolower($cityData["regex"]) . "\b~", strtolower($postData["message"])) > 0) {
         $id = explode("_", $postData["id"]);
 
         $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));

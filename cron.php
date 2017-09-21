@@ -40,7 +40,11 @@ foreach ($data as $postData) {
         }
 
         if (strpos(strtolower($row["name"]), "sint") !== false) {
-            $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
+            if (!isset($row["regex"])) {
+                $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
+            } else {
+                $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["regex"]);
+            }
         }
 
         if (!isset($row["regex"])) {

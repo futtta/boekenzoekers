@@ -15,39 +15,73 @@ $database = new \Medoo\Medoo(
         "password" => $dbPassword
     )
 );
-?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Boekenzoekers</title>
-    <link rel="stylesheet" type="text/css" href="main.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body>
+if (array_key_exists("feed",$_GET) && $_GET["feed"]==="rss") {
+    outputFeed();
+} else {
+    outputHTML();
+}
 
-<form action="">
-    <p>
-        <label for="gemeente">Gemeente/Postcode:</label>&nbsp;
-        <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam" value="<?php getGemeente(); ?>">&nbsp;
-        <input type="submit" value="Zoek">
-    </p>
-</form>
+function outputFeed() {
+    global $fbGroupID;
 
-<table>
-    <tr>
-        <th>Postcode</th>
-        <th>Gemeente</th>
-        <th>Tekst</th>
-        <th>Post Datum</th>
-    </tr>
-    <?php drawPosts(); ?>
-</table>
+    $feed = new \Zelenin\Feed;
+    $feed->addChannel("http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"]."?feed=rss");
 
-</body>
-</html>
+    $feed
+        ->addChannelTitle('Boekenjagers zoekresultaten voor "'.ucfirst(getGemeente()).'"')
+        ->addChannelLink('http://boeken-jagers.be/');
+        
+    $data=getPostsFromDB();
 
-<?php
+    if(!empty($data)) {
+        foreach ($data as $row) {
+            $feed->addItem();
+            $feed
+                ->addItemTitle(htmlentities(shortenText($row["text"])))
+                ->addItemLink("https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"])
+                ->addItemPubDate($row["time"])
+                ->addItemDescription(htmlentities($row["text"]));
+        }
+    }
+    
+    echo $feed;
+}
+
+function outputHTML() {
+    ?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Boekenzoekers</title>
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+
+    <form action="">
+        <p>
+            <label for="gemeente">Gemeente/Postcode:</label>&nbsp;
+            <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam" value="<?php echo getGemeente(); ?>">&nbsp;
+            <input type="submit" value="Zoek">
+        </p>
+    </form>
+
+    <table>
+        <tr>
+            <th>Postcode</th>
+            <th>Gemeente</th>
+            <th>Tekst</th>
+            <th>Post Datum</th>
+        </tr>
+        <?php drawPosts(); ?>
+    </table>
+
+    </body>
+    </html>
+    <?php
+}
+
 /**
  * Shorten text to 100 letters
  * @param $text String input text
@@ -109,19 +143,15 @@ function getLimit(&$search = array())
  */
 function drawPosts()
 {
-    global $database,$fbGroupID;
+    global $fbGroupID;
 
-    $search = getSearch();
-    $limit = getLimit($search);
-    $count = $database->count("posts", "*", $search, $limit);
+    $data=getPostsFromDB();
 
-    if($count == 0) {
+    if(empty($data)) {
         print("<tr>");
         print("<td colspan=\"4\">Geen resultaten gevonden: <b>Keep calm and hide a book!</b></td>");
         print("</tr>");
     } else {
-        $data = $database->select("posts", "*", $search, $limit);
-
         foreach ($data as $row) {
             print("<tr>");
             print("<td>" . $row["zipcode"] . "</td>");
@@ -131,6 +161,22 @@ function drawPosts()
             print("</tr>");
         }
     }
+}
+
+function getPostsFromDB()
+{
+    global $database;
+
+    $search = getSearch();
+    $limit = getLimit($search);
+    $count = $database->count("posts", "*", $search, $limit);
+    if($count == 0) {
+        $data = "";
+    } else {
+        $data = $database->select("posts", "*", $search, $limit);
+    }
+    
+    return $data;
 }
 
 /**
@@ -155,7 +201,7 @@ function drawTime($time)
 function getGemeente()
 {
     if(isset($_GET["gemeente"])) {
-        print(htmlspecialchars($_GET["gemeente"]));
+        return htmlspecialchars($_GET["gemeente"]);
     }
 }
 ?>

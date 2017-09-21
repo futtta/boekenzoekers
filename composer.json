@@ -1,5 +1,6 @@
 {
     "require": {
-        "catfan/Medoo": "^1.4"
+        "catfan/Medoo": "^1.4",
+        "zelenin/rss-generator": "~2.1.1"
     }
 }

@@ -156,7 +156,14 @@ function drawPosts()
             print("<tr>");
             print("<td>" . $row["zipcode"] . "</td>");
             print("<td>" . $row["gemeente"] . "</td>");
-            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a></td>");
+            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
+
+            if (isLoggedIn()) {
+                print(" <a href=\"#delete=".$row["id"]."\">[delete]</a>");
+            }
+
+            print("</td>");
+
             print("<td>" . drawTime($row["time"]) . "</td>");
             print("</tr>");
         }
@@ -203,5 +210,20 @@ function getGemeente()
     if(isset($_GET["gemeente"])) {
         return htmlspecialchars($_GET["gemeente"]);
     }
+}
+
+/**
+ * Is user Logged In
+ * @return bool
+ */
+function isLoggedIn()
+{
+    global $login;
+
+    if( array_key_exists("username", $_GET) && array_key_exists("username", $_GET)) {
+        return (isset($login[$_GET["username"]]) && $login[$_GET["username"]] == $_GET["password"]);
+    }
+
+    return false;
 }
 ?>

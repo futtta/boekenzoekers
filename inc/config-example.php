@@ -26,3 +26,8 @@ $fbGroupID = 0;
 
 //blacklist words
 $blacklist = array();
+
+//Login om posts te deleten
+$login = array(
+    "username" => "password"
+);

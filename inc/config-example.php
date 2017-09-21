@@ -23,3 +23,6 @@ $daysBeforeDelete = 90;
 
 //Boekenjagers GroupID
 $fbGroupID = 0;
+
+//blacklist words
+$blacklist = array();

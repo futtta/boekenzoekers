@@ -69,26 +69,28 @@ function deleteOldPosts()
  */
 function checkNameinText($cityData, $postData)
 {
-    global $database;
+    global $database, $blacklist;
 
-    if (preg_match("~\b" . strtolower($cityData["regex"]) . "\b~", strtolower($postData["message"])) > 0) {
-        $id = explode("_", $postData["id"]);
+    if ( preg_match("~\b" . strtolower($cityData["regex"]) . "\b~", strtolower($postData["message"])) > 0 ) {
+        if ( !is_array($blacklist) || $postData["message"] === str_replace( $blacklist, "", $postData["message"] ) ) {
+            $id = explode("_", $postData["id"]);
 
-        $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));
+            $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));
 
-        if ($count == 0) {
-            $database->insert("posts", array(
-                "zipcode" => $cityData["zipcode"],
-                "gemeente" => $cityData["name"],
-                "postID" => $id[1],
-                "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
-                "text" => $postData["message"]
-            ));
-        } else {
-            $database->update("posts",
-                array("text" => $postData["message"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
-                array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
-            );
+            if ($count == 0) {
+                $database->insert("posts", array(
+                    "zipcode" => $cityData["zipcode"],
+                    "gemeente" => $cityData["name"],
+                    "postID" => $id[1],
+                    "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
+                    "text" => $postData["message"]
+                ));
+            } else {
+                $database->update("posts",
+                    array("text" => $postData["message"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
+                    array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
+                );
+            }
         }
     }
 }

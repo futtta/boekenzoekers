@@ -16,15 +16,11 @@ $database = new \Medoo\Medoo(
     )
 );
 
-//Get the last checked date
-$lastDate = $database->get("gemeentes", array("zipcode", "name"), array("zipcode" => 1));
-$currentDate = time();
-
-//Save the last checked date in the database
-$database->update("gemeentes", array("name" => $currentDate), array("zipcode" => 1));
+//Get max date from posts-table
+$lastDate = strtotime($database->max("posts","time"));
 
 //Request feed from facebook
-$data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&since=" . $lastDate["name"] . "&access_token=" . $appID . "|" . $appSecret);
+$data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&since=" . $lastDate . "&access_token=" . $appID . "|" . $appSecret);
 $data = json_decode($data, true)["data"];
 
 //Load data from gemeentes

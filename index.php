@@ -1,5 +1,6 @@
 <?php
 date_default_timezone_set("Europe/Brussels");
+header("Access-Control-Allow-Origin: *");
 
 //Includes
 require_once("inc/config.php");

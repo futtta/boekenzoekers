@@ -67,4 +67,5 @@ a:active {
 
 @media (max-width: 782px) {
     .desktop {display:none;}
+    input[type="text"], select{width: 200px;}
 }

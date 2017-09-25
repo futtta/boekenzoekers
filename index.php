@@ -61,16 +61,16 @@ function outputHTML() {
 
     <form action="">
         <p>
-            <label for="gemeente">Gemeente/Postcode:</label>&nbsp;
+            <label for="gemeente" class="desktop">Gemeente/Postcode:</label>&nbsp;
             <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam" value="<?php echo getGemeente(); ?>">&nbsp;
             <input type="submit" value="Zoek">
         </p>
     </form>
 
-    <table>
+    <table id="result">
         <tr>
-            <th>Postcode</th>
-            <th>Gemeente</th>
+            <th class="desktop">Postcode</th>
+            <th class="desktop">Gemeente</th>
             <th>Tekst</th>
             <th>Post Datum</th>
         </tr>
@@ -154,8 +154,8 @@ function drawPosts()
     } else {
         foreach ($data as $row) {
             print("<tr>");
-            print("<td>" . $row["zipcode"] . "</td>");
-            print("<td>" . $row["gemeente"] . "</td>");
+            print("<td class=\"desktop\">" . $row["zipcode"] . "</td>");
+            print("<td class=\"desktop\">" . $row["gemeente"] . "</td>");
             print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
 
             if (isLoggedIn()) {

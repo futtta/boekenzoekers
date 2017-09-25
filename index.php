@@ -17,6 +17,12 @@ $database = new \Medoo\Medoo(
     )
 );
 
+if (isLoggedIn() && array_key_exists("delete", $_GET) && is_numeric($_GET["delete"])) {
+    $database->delete("posts", array("id" => $_GET["delete"]));
+    print("<b>Succesvol post #" . $_GET["delete"] . " verwijderd</b>");
+}
+
+
 if (array_key_exists("feed",$_GET) && $_GET["feed"]==="rss") {
     outputFeed();
 } else {
@@ -160,7 +166,7 @@ function drawPosts()
             print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
 
             if (isLoggedIn()) {
-                print(" <a href=\"#delete=".$row["id"]."\">[delete]</a>");
+                print(" <a href=\"" . generateURL() . "&delete=".$row["id"]."\">[delete]</a>");
             }
 
             print("</td>");
@@ -208,7 +214,7 @@ function drawTime($time)
  */
 function getGemeente()
 {
-    if(isset($_GET["gemeente"])) {
+    if(array_key_exists("gemeente", $_GET)) {
         return htmlspecialchars($_GET["gemeente"]);
     }
 }
@@ -226,5 +232,28 @@ function isLoggedIn()
     }
 
     return false;
+}
+
+/**
+ * GenerateURL
+ * @return string URL
+ */
+function generateURL()
+{
+    $url = "index.php";
+
+    if(isLoggedIn()) {
+        $url .= "?username=" . $_GET["username"] . "&password=" . $_GET["password"];
+
+        if (array_key_exists("gemeente", $_GET)) {
+            $url .= "&gemeente=" . $_GET["gemeente"];
+        }
+    } else {
+        if (array_key_exists("gemeente", $_GET)) {
+            $url .= "?gemeente=" . $_GET["gemeente"];
+        }
+    }
+
+    return $url;
 }
 ?>

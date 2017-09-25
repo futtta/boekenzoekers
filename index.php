@@ -1,10 +1,14 @@
 <?php
 date_default_timezone_set("Europe/Brussels");
-header("Access-Control-Allow-Origin: *");
 
 //Includes
 require_once("inc/config.php");
 require_once("vendor/autoload.php");
+
+// set CORS header
+if (isset($corsDomains)) {
+    header("Access-Control-Allow-Origin: ".$corsDomains);
+}
 
 //Init Database
 $database = new \Medoo\Medoo(
@@ -23,10 +27,27 @@ if (isLoggedIn() && array_key_exists("delete", $_GET) && is_numeric($_GET["delet
 }
 
 
-if (array_key_exists("feed",$_GET) && $_GET["feed"]==="rss") {
+if (array_key_exists("output",$_GET) && $_GET["output"]==="rss") {
     outputFeed();
+} else if (array_key_exists("output",$_GET) && $_GET["output"]==="json") {
+    outputJSON();
 } else {
     outputHTML();
+}
+
+function outputJSON() {
+    global $fbGroupID;
+
+    $data=getPostsFromDB();
+    foreach ($data as $row) {
+        $thisRow["gemeente"]=$row["gemeente"];
+        $thisRow["zipcode"]=$row["zipcode"];
+        $thisRow["text"]=htmlentities($row["text"]);
+        $thisRow["fbURL"]="https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"];
+        $dataOut[]=$thisRow;
+    }
+
+    echo json_encode($dataOut);
 }
 
 function outputFeed() {

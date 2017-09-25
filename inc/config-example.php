@@ -31,3 +31,6 @@ $blacklist = array();
 $login = array(
     "username" => "password"
 );
+
+//cross domain requests OK voor domain
+$corsDomains = "http://www.boeken-jagers.be";

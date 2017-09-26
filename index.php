@@ -83,11 +83,11 @@ function outputHTML() {
     </head>
     <body>
 
-    <form action="">
+    <form id="boekzoekform" action="">
         <p>
             <label for="gemeente" class="desktop">Gemeente/Postcode:</label>&nbsp;
             <input type="text" id="gemeente" name="gemeente" placeholder="Postcode of Gemeentenaam" value="<?php echo getGemeente(); ?>">&nbsp;
-            <input type="submit" value="Zoek">
+            <input id="boekzoekknop" type="submit" value="Zoek">
         </p>
     </form>
 

@@ -36,14 +36,12 @@ if (array_key_exists("output",$_GET) && $_GET["output"]==="rss") {
 }
 
 function outputJSON() {
-    global $fbGroupID;
-
     $data=getPostsFromDB();
     foreach ($data as $row) {
         $thisRow["gemeente"]=$row["gemeente"];
         $thisRow["zipcode"]=$row["zipcode"];
         $thisRow["text"]=htmlentities($row["text"]);
-        $thisRow["fbURL"]="https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"];
+        $thisRow["fbURL"]=buildFBurl($row["postID"]);
         $dataOut[]=$thisRow;
     }
 
@@ -51,8 +49,6 @@ function outputJSON() {
 }
 
 function outputFeed() {
-    global $fbGroupID;
-
     $feed = new \Zelenin\Feed;
     $feed->addChannel("http://".$_SERVER["HTTP_HOST"].$_SERVER["PHP_SELF"]."?feed=rss");
 
@@ -67,7 +63,7 @@ function outputFeed() {
             $feed->addItem();
             $feed
                 ->addItemTitle(htmlentities(shortenText($row["text"])))
-                ->addItemLink("https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"])
+                ->addItemLink(buildFBurl($row["postID"]))
                 ->addItemPubDate($row["time"])
                 ->addItemDescription(htmlentities($row["text"]));
         }
@@ -171,8 +167,6 @@ function getLimit(&$search = array())
  */
 function drawPosts()
 {
-    global $fbGroupID;
-
     $data=getPostsFromDB();
 
     if(empty($data)) {
@@ -184,7 +178,7 @@ function drawPosts()
             print("<tr>");
             print("<td class=\"desktop\">" . $row["zipcode"] . "</td>");
             print("<td class=\"desktop\">" . $row["gemeente"] . "</td>");
-            print("<td><a href=\"https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $row["postID"] . "\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
+            print("<td><a href=\"".buildFBurl($row["postID"])."\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
 
             if (isLoggedIn()) {
                 print(" <a href=\"" . generateURL() . "&delete=".$row["id"]."\">[delete]</a>");
@@ -276,5 +270,15 @@ function generateURL()
     }
 
     return $url;
+}
+
+/**
+ * buildFBurl
+ * @param $postID string with FB post ID
+ * @return string full FB story URL
+ */
+function buildFBurl($postID) {
+    global $fbGroupID;
+    return "https://www.facebook.com/permalink.php?id=" . $fbGroupID . "&v=wall&story_fbid=" . $postID;
 }
 ?>

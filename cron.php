@@ -20,7 +20,7 @@ $database = new \Medoo\Medoo(
 $lastDate = strtotime($database->max("posts","time"));
 
 //Request feed from facebook
-$data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&since=" . $lastDate . "&access_token=" . $appID . "|" . $appSecret);
+$data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&fields=from,message,updated_time,id&since=" . $lastDate . "&access_token=" . $appID . "|" . $appSecret);
 $data = json_decode($data, true)["data"];
 
 //Load data from gemeentes
@@ -87,11 +87,12 @@ function checkNameinText($cityData, $postData)
                     "gemeente" => $cityData["name"],
                     "postID" => $id[1],
                     "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
-                    "text" => $postData["message"]
+                    "text" => $postData["message"],
+                    "auteur" => $postData["from"]["name"]
                 ));
             } else {
                 $database->update("posts",
-                    array("text" => $postData["message"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
+                    array("text" => $postData["message"], "auteur" => $postData["from"]["name"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
                     array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
                 );
             }

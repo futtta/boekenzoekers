@@ -138,7 +138,8 @@ function getSearch()
         if (is_numeric($zipcode)) {
             $search["zipcode"] = $zipcode;
         } else {
-            $search["gemeente[~]"] = $zipcode;
+            $search["OR"]["gemeente[~]"] = $zipcode;
+            $search["OR"]["auteur[~]"] = $zipcode;
         }
     }
 
@@ -178,7 +179,7 @@ function drawPosts()
             print("<tr>");
             print("<td class=\"desktop\">" . $row["zipcode"] . "</td>");
             print("<td class=\"desktop\">" . $row["gemeente"] . "</td>");
-            print("<td><a href=\"".buildFBurl($row["postID"])."\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
+            print("<td>" . $row["auteur"] . ": <a href=\"".buildFBurl($row["postID"])."\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
 
             if (isLoggedIn()) {
                 print(" <a href=\"" . generateURL() . "&delete=".$row["id"]."\">[delete]</a>");

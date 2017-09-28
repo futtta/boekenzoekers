@@ -42,6 +42,9 @@ function outputJSON() {
         $thisRow["zipcode"]=$row["zipcode"];
         $thisRow["text"]=htmlentities($row["text"]);
         $thisRow["fbURL"]=buildFBurl($row["postID"]);
+        if (!empty($row["auteur"])) {
+            $thisRow["auteur"]=htmlentities($row["auteur"]);
+        }
         $dataOut[]=$thisRow;
     }
 
@@ -66,6 +69,9 @@ function outputFeed() {
                 ->addItemLink(buildFBurl($row["postID"]))
                 ->addItemPubDate($row["time"])
                 ->addItemDescription(htmlentities($row["text"]));
+            if (!empty($row["auteur"])) {
+                $feed->addItemAuthor($row["auteur"]);
+            }
         }
     }
     
@@ -179,7 +185,10 @@ function drawPosts()
             print("<tr>");
             print("<td class=\"desktop\">" . $row["zipcode"] . "</td>");
             print("<td class=\"desktop\">" . $row["gemeente"] . "</td>");
-            print("<td>" . $row["auteur"] . ": <a href=\"".buildFBurl($row["postID"])."\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
+            print("<td><a href=\"".buildFBurl($row["postID"])."\" target=\"_blank\">" . shortenText($row["text"]) . "</a>");
+            if (!empty($row["auteur"])) {
+                print (" <i>(door " . $row["auteur"] . ")</i>");
+            }
 
             if (isLoggedIn()) {
                 print(" <a href=\"" . generateURL() . "&delete=".$row["id"]."\">[delete]</a>");

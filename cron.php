@@ -35,21 +35,21 @@ foreach ($data as $postData) {
             break;
         }
 
+        //Init Regex
+        $row["regex"] = $row["name"];
+
+        //Check if there is a - or not in a city name
         if (strpos($row["name"], "-") !== false) {
-            $row["regex"] = str_replace("-", "[-|\s]", $row["name"]);
+            $row["regex"] = str_replace("-", "[-|\s]", $row["regex"]);
         }
 
+        //Check for sint or st. in a city name
         if (strpos(strtolower($row["name"]), "sint") !== false) {
-            if (!isset($row["regex"])) {
-                $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["name"]);
-            } else {
-                $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["regex"]);
-            }
+            $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["regex"]);
         }
 
-        if (!isset($row["regex"])) {
-            $row["regex"] = $row["name"];
-        }
+        //Check for "de" "het" "een" in a sentence
+        $row["regex"] = "(^(?!de|het|een).*) ".$row["regex"];
 
         checkNameinText($row, $postData);
     }

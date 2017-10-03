@@ -141,11 +141,20 @@ function getSearch()
             $zipcode = "sint-".$matches[2];
         }
 
-        if (is_numeric($zipcode)) {
-            $search["zipcode"] = $zipcode;
+        if (isset($_GET["timeFrom"]) && is_numeric($_GET["timeFrom"])) {
+            $timeFrom = $_GET["timeFrom"];
         } else {
-            $search["OR"]["gemeente[~]"] = $zipcode;
-            $search["OR"]["auteur[~]"] = $zipcode;
+            $timeFrom = "0000000001";
+        }
+        $timeFrom = date("Y-m-d H:i:s",$timeFrom);
+
+        if (is_numeric($zipcode)) {
+            $search["AND"]["zipcode"] = $zipcode;
+            $search["AND"]["time[>]"] = $timeFrom;
+        } else {
+            $search["AND"]["OR"]["gemeente[~]"] = $zipcode;
+            $search["AND"]["OR"]["auteur[~]"] = $zipcode;
+            $search["AND"]["time[>]"] = $timeFrom;
         }
     }
 

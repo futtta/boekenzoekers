@@ -17,7 +17,7 @@ $database = new \Medoo\Medoo(
 );
 
 //Get max date from posts-table
-$lastDate = strtotime($database->max("posts","time"));
+$lastDate = strtotime($database->max("posts", "time"));
 
 //Request feed from facebook
 $data = fetchUrl("https://graph.facebook.com/" . $fbGroupID . "/feed?limit=100&fields=from,message,updated_time,id&since=" . $lastDate . "&access_token=" . $appID . "|" . $appSecret);
@@ -48,9 +48,6 @@ foreach ($data as $postData) {
             $row["regex"] = str_replace("sint", "(st\.?|sint)", $row["regex"]);
         }
 
-        //Check for "de" "het" "een" in a sentence
-        $row["regex"] = "(^(?!de|het|een).*) ".$row["regex"];
-
         checkNameinText($row, $postData);
     }
 }
@@ -75,26 +72,28 @@ function checkNameinText($cityData, $postData)
 {
     global $database, $blacklist;
 
-    if ( preg_match("~\b" . strtolower($cityData["regex"]) . "\b~", strtolower($postData["message"])) > 0 ) {
-        if ( !is_array($blacklist) || $postData["message"] === str_replace( $blacklist, "", $postData["message"] ) ) {
-            $id = explode("_", $postData["id"]);
+    if (preg_match("~\b" . strtolower($cityData["regex"]) . "\b~", strtolower($postData["message"])) > 0) {
+        if (preg_match("/(de|het|een) " . strtolower($cityData["regex"]) . "/", strtolower($postData["message"])) == 0) {
+            if (!is_array($blacklist) || $postData["message"] === str_replace($blacklist, "", $postData["message"])) {
+                $id = explode("_", $postData["id"]);
 
-            $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));
+                $count = $database->count("posts", array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"]));
 
-            if ($count == 0) {
-                $database->insert("posts", array(
-                    "zipcode" => $cityData["zipcode"],
-                    "gemeente" => $cityData["name"],
-                    "postID" => $id[1],
-                    "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
-                    "text" => $postData["message"],
-                    "auteur" => $postData["from"]["name"]
-                ));
-            } else {
-                $database->update("posts",
-                    array("text" => $postData["message"], "auteur" => $postData["from"]["name"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
-                    array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
-                );
+                if ($count == 0) {
+                    $database->insert("posts", array(
+                        "zipcode" => $cityData["zipcode"],
+                        "gemeente" => $cityData["name"],
+                        "postID" => $id[1],
+                        "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"])),
+                        "text" => $postData["message"],
+                        "auteur" => $postData["from"]["name"]
+                    ));
+                } else {
+                    $database->update("posts",
+                        array("text" => $postData["message"], "auteur" => $postData["from"]["name"], "time" => date("Y-m-d H:i:s", strtotime($postData["updated_time"]))),
+                        array("postID" => $id[1], "gemeente" => $cityData["name"], "zipcode" => $cityData["zipcode"])
+                    );
+                }
             }
         }
     }

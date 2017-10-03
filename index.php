@@ -137,20 +137,19 @@ function getSearch()
     if (isset($_GET["gemeente"])) {
         $zipcode = $_GET["gemeente"];
 
-        // variaties van sint/st/st.
-        if (preg_match("/(st\.?|sint)[-|\s]([A-z]*)/i", $zipcode, $matches)) {
-            $zipcode = "sint-".$matches[2];
-        }
-
         // zipcode of gemeente/auteur
-        if (is_numeric($zipcode)) {
-            $_search["zipcode"] = $zipcode;
-        } else {
+        if (!is_numeric($zipcode)) {
+            // variaties van sint/st/st.
+            if (preg_match("/(st\.?|sint)[-|\s]([A-z]*)/i", $zipcode, $matches)) {
+                $zipcode = "sint-".$matches[2];
+            }
             $_search["OR"]["gemeente[~]"] = $zipcode;
             $_search["OR"]["auteur[~]"] = $zipcode;
+        } else {
+            $_search["zipcode"] = $zipcode;
         }
 
-        // als we een UNIX timestamp hebben (of iets dat er op lijkt) voegen we die toe aan de query
+        // als we een timeFrom met UNIX timestamp hebben (of iets dat er op lijkt) voegen we die toe aan de query
         if ( isset($_GET["timeFrom"]) && is_numeric($_GET["timeFrom"]) && strlen($_GET["timeFrom"]) === 10 ) {
             $timeFrom = date("Y-m-d H:i:s",$_GET["timeFrom"]);
             $search["AND"]=$_search;

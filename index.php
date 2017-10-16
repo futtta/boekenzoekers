@@ -42,6 +42,7 @@ function outputJSON() {
         $thisRow["zipcode"]=$row["zipcode"];
         $thisRow["text"]=htmlentities($row["text"]);
         $thisRow["fbURL"]=buildFBurl($row["postID"]);
+        $thisRow["date"]=strtotime($row["time"]);
         if (!empty($row["auteur"])) {
             $thisRow["auteur"]=htmlentities($row["auteur"]);
         }
